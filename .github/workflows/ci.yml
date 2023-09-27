@@ -38,4 +38,4 @@ jobs:
         run: pnpm lint
 
       - name: mrl
-        run: pnpm run mrl check
+        run: pnpm exec mrl check
