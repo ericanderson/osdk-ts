@@ -24,7 +24,7 @@ export type ConcreteObjectType<
 > = O["objects"][K];
 
 export interface Client<O extends OntologyDefinition<any>> {
-  objectSet: <const K extends ObjectTypesFrom<O>>(
+  objectSet: <K extends ObjectTypesFrom<O>>(
     type: K,
     opts?: ObjectSetOptions<O, K>,
   ) => ObjectSet<O, K>;

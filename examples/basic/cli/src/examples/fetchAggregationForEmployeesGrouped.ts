@@ -23,16 +23,18 @@ import type { OntologyType } from "../OntologyType";
 export async function fetchAggregationForEmployeesGrouped(
   client: Client<OntologyType>,
 ) {
-  const result = await client.objectSet("Employee").aggregateOrThrow({
-    select: {
-      locationCity: "approximateDistinct",
-      locationName: "approximateDistinct",
-      employeeNumber: ["avg", "max", "min"],
-    },
-    groupBy: {
-      locationType: "exact",
-    },
-  });
+  const result = await client.objectSet("Employee").aggregateOrThrow(
+    {
+      select: {
+        locationCity: "approximateDistinct",
+        locationName: "approximateDistinct",
+        employeeNumber: ["avg", "max", "min"],
+      },
+      groupBy: {
+        locationType: "exact",
+      },
+    } as const,
+  );
 
   console.log("fetchAggregationForEmployeesGrouped()");
   console.log(JSON.stringify(result, undefined, 2));
