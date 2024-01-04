@@ -25,7 +25,12 @@ import type { FetchPageOrThrowArgs } from "../object/fetchPageOrThrow.js";
 import type { OsdkInterfaceFrom, OsdkObjectFrom } from "../OsdkObjectFrom.js";
 import type { PageResult } from "../PageResult.js";
 import type { AggregateOpts } from "../query/aggregations/AggregateOpts.js";
-import type { AggregationsResults, WhereClause } from "../query/index.js";
+import type {
+  AggregationsResults,
+  OrderBy,
+  OrderByTerm,
+  WhereClause,
+} from "../query/index.js";
 import type { LinkTypesFrom } from "./LinkTypesFrom.js";
 import type { ObjectSetListener } from "./ObjectSetListener.js";
 
@@ -81,6 +86,10 @@ export interface BaseObjectSet<
     >,
   ) => ObjectSet<O, K>;
 
+  orderBy: (
+    ...terms: OrderByTerm<ObjectOrInterfaceDefinitionFrom<O, K>>[]
+  ) => ObjectSet<O, K>;
+
   pivotTo: <T extends LinkTypesFrom<O, K>>(
     type: T & string,
     opts?: ObjectSetOptions<O, O["objects"][K]["links"][T]["targetType"]>,
@@ -94,6 +103,7 @@ export interface ObjectSetOptions<
   K extends ObjectOrInterfaceKeysFrom<O>,
 > {
   $where?: WhereClause<ObjectOrInterfaceDefinitionFrom<O, K>>;
+  $orderBy?: OrderBy<ObjectOrInterfaceDefinitionFrom<O, K>>;
 }
 
 export type ObjectSetFactory<O extends OntologyDefinition<any>> = <

@@ -15,8 +15,11 @@
  */
 
 import type {
+  InterfaceDefinitionFrom,
+  InterfaceKeysFrom,
   ObjectOrInterfaceKeysFrom,
   ObjectOrInterfacePropertyKeysFrom,
+  ObjectTypeDefinitionFrom,
   OntologyDefinition,
 } from "@osdk/api";
 import { loadObjectSetV2 } from "@osdk/gateway/requests";
@@ -26,6 +29,7 @@ import type { ClientContext } from "@osdk/shared.net";
 import type { Wire } from "../internal/net/index.js";
 import type { OsdkObjectFrom } from "../OsdkObjectFrom.js";
 import type { PageResult } from "../PageResult.js";
+import type { OrderByTerm } from "../query/OrderBy.js";
 import type { NOOP } from "../util/NOOP.js";
 import { convertWireToOsdkObjects } from "./convertWireToOsdkObjects.js";
 
@@ -54,6 +58,10 @@ export async function fetchPageOrThrow<
     type: "base",
     objectType,
   },
+  orderByArg?: OrderByTerm<
+    T extends InterfaceKeysFrom<O> ? InterfaceDefinitionFrom<O, T>
+      : ObjectTypeDefinitionFrom<O, T>
+  >[],
 ): Promise<
   PageResult<
     NOOP<
