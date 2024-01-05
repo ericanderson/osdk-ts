@@ -61,6 +61,8 @@ export class ObjectSetListenerWebsocket<
     ObjectSetListenerWebsocket<any>
   >();
 
+  static #requestId = 0;
+
   static getInstance<O extends OntologyDefinition<any, any, any>>(
     client: ClientContext<O>,
   ): ObjectSetListenerWebsocket<O> {
@@ -122,7 +124,7 @@ export class ObjectSetListenerWebsocket<
     objectSet: Wire.ObjectSet,
     listener: ObjectSetListener<O, K>,
   ): () => void {
-    const requestId = crypto.randomUUID();
+    const requestId = `${ObjectSetListenerWebsocket.#requestId++}`;
     const expiry = setTimeout(() => {
       this.#expire(requestId);
     }, ONE_DAY_MS);
