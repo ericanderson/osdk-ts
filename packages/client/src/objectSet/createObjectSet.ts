@@ -82,6 +82,7 @@ export function createObjectSet<
         objectType,
         args ?? {},
         objectSet,
+        opts?.$orderBy,
       ) as any;
     },
 
@@ -95,6 +96,14 @@ export function createObjectSet<
         where: modernToLegacyWhereClause(clause),
       });
     },
+
+    orderBy: (...terms) => {
+      return createObjectSet(objectType, clientCtx, {
+        ...opts,
+        $orderBy: [...opts?.$orderBy ?? [], ...terms],
+      }, objectSet);
+    },
+
     // [Symbol.asyncIterator]: () => {
     //   throw "";
     // },
