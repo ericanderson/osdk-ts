@@ -54,12 +54,15 @@ export default async (options, ourOptions) => {
     },
   };
 
+  const publicEntries = new Set();
+
   // pick up any public api files and add those as entry points
   if (fs.existsSync(`${typesDir}/public`)) {
     const publicFiles = fs.readdirSync(`${typesDir}/public`);
     for (const file of publicFiles) {
-      typeSharedOptions.entry[`public/${file.slice(0, -5)}`] =
-        `${typesDir}/public/${file}`;
+      const entry = file.slice(0, -5);
+      publicEntries.add(entry);
+      typeSharedOptions.entry[`public/${entry}`] = `${typesDir}/public/${file}`;
     }
   }
 
@@ -71,6 +74,23 @@ export default async (options, ourOptions) => {
       format: ["cjs"],
       outDir: cjsDir,
       onSuccess: () => {
+        // if we're in watch mode, we simlink the types in so that local dev stays working if a dependent package updates
+        if (options.watch) {
+          // root index files
+          fs.writeFileSync(
+            path.join(cjsDir, `index.d.cts`),
+            `export * from "../types/index";`,
+          );
+
+          // fill in any public API as well
+          for (const entry of publicEntries) {
+            fs.writeFileSync(
+              path.join(cjsDir, "public", `${entry}d.cts`),
+              `export * from "../../types/public/${entry}";`,
+            );
+          }
+        }
+
         // we need to mark the .js files as commonjs because our root package.json says that we're a module
         // we avoid using .cjs extensions here just in case someone's bundler depends on that extension
         // ESM still works because it uses the explicit .mjs extensions
@@ -88,6 +108,22 @@ export default async (options, ourOptions) => {
       format: ["esm"],
       outDir: esmDir,
       onSuccess: () => {
+        // if we're in watch mode, we simlink the types in so that local dev stays working if a dependent package updates
+        if (options.watch) {
+          fs.writeFileSync(
+            path.join(esmDir, "index.d.ts"),
+            `export * from "../types/index.js";`,
+          );
+
+          // fill in any public API as well
+          for (const entry of publicEntries) {
+            fs.writeFileSync(
+              path.join(esmDir, "public", `${entry}.d.ts`),
+              `export * from "../../types/public/${entry}.js";`,
+            );
+          }
+        }
+
         console.log("esm source 👍");
       },
     },
