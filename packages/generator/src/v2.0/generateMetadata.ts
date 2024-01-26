@@ -23,7 +23,10 @@ export async function generateOntologyMetadataFile(
   ontology: WireOntologyDefinition,
   fs: MinimalFs,
   outDir: string,
+  additionalUserAgents: string[] = [],
 ) {
+  const userAgent = ["foundry-typescript-osdk/2.0.0", ...additionalUserAgents]
+    .join(" ");
   fs.writeFile(
     path.join(outDir, "OntologyMetadata.ts"),
     await formatTs(
@@ -31,7 +34,7 @@ export async function generateOntologyMetadataFile(
       export const OntologyMetadata = {
         ontologyRid: "${ontology.ontology.rid}",
         ontologyApiName: "${ontology.ontology.apiName}",
-        userAgent: "foundry-typescript-osdk/2.0.0",
+        userAgent: "${userAgent}",
       }
       `,
     ),

@@ -31,23 +31,25 @@ export function createClientContext<
   ontology: T,
   stack: string,
   tokenProvider: () => Promise<string> | string,
-  additionalUserAgent?: `${string} (${string})`,
+  additionalUserAgent?: string,
   fetchFn: typeof globalThis.fetch = fetch,
 ): ClientContext<T> {
   if (stack.length === 0) {
     throw new Error("stack cannot be empty");
   }
+
+  const userAgent = [
+    "@osdk/shared.net/0.0.0",
+    additionalUserAgent,
+    ontology.metadata.userAgent,
+  ].filter(s => s != null).join(" ");
+
   const retryingFetchWithAuthOrThrow = createFetchHeaderMutator(
     createRetryingFetch(createFetchOrThrow(fetchFn)),
     async (headers) => {
       const token = await tokenProvider();
       headers.set("Authorization", `Bearer ${token}`);
-      headers.set(
-        "Fetch-User-Agent",
-        `@osdk/shared.net/0.0.0 () ${
-          additionalUserAgent ? additionalUserAgent + " " : ""
-        }${ontology.metadata.userAgent}`,
-      );
+      headers.set("Fetch-User-Agent", userAgent);
       return headers;
     },
   );

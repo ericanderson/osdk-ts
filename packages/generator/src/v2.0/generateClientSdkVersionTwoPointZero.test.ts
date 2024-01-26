@@ -30,6 +30,8 @@ describe("generator", () => {
       TodoWireOntology,
       helper.minimalFiles,
       BASE_PATH,
+      undefined,
+      ["foo/1.0.0"],
     );
 
     const files = helper.getFiles();

@@ -48,6 +48,11 @@ export async function generatePackage(
   await mkdir(packagePath, { recursive: true });
 
   const inMemoryFileSystem: { [fileName: string]: string } = {};
+  const generatorPackageVersion = await getGeneratorPackageVersion();
+  const additionalUserAgents = [
+    `${options.packageName}/${options.packageVersion}`,
+    `@osdk/foundry-sdk-generator/${generatorPackageVersion}`,
+  ];
   await generateClientSdkVersionOneDotOne(
     ontology,
     {
@@ -60,6 +65,8 @@ export async function generatePackage(
       readdir: path => readdir(path),
     },
     packagePath,
+    undefined,
+    additionalUserAgents,
   );
 
   const compilerOutput = compileInMemory(inMemoryFileSystem);
@@ -129,10 +136,18 @@ export async function generatePackage(
 }
 
 async function getDependencyVersion(dependency: string): Promise<string> {
-  if (dependencies[dependency] !== undefined) {
-    return dependencies[dependency]!;
-  }
+  const packageJson = await getPackageJson();
+  const parsedPackageJson = JSON.parse(packageJson);
+  return parsedPackageJson.dependencies[dependency];
+}
 
+async function getGeneratorPackageVersion(): Promise<string> {
+  const packageJson = await getPackageJson();
+  const parsedPackageJson = JSON.parse(packageJson);
+  return parsedPackageJson.version;
+}
+
+async function getPackageJson(): Promise<string> {
   // we need to carefully use find-up here. our __dirname is under build/cjs which has a stub
   // package.json which marks this as a commonjs module. We need to start our find-up in build instead
   // which will spider to the correct package.json.
@@ -146,6 +161,5 @@ async function getDependencyVersion(dependency: string): Promise<string> {
       `Could not find package.json in current working directory: ${process.cwd()}`,
     );
   }
-  const parsedPackageJson = JSON.parse(packageJson);
-  return parsedPackageJson.dependencies[dependency];
+  return packageJson;
 }

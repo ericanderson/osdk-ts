@@ -277,4 +277,68 @@ describe(generateMetadataFile, () => {
       "
     `);
   });
+
+  it("handles additional user agents", async () => {
+    const helper = createMockMinimalFiles();
+    const BASE_PATH = "/foo";
+
+    await generateMetadataFile(
+      {
+        ontology: {
+          apiName: "apiName",
+          displayName: "",
+          description: "",
+          rid: "rid",
+        },
+        objectTypes: {},
+        actionTypes: {},
+        queryTypes: {},
+        interfaceTypes: {},
+        sharedPropertyTypes: {},
+      },
+      helper.minimalFiles,
+      BASE_PATH,
+      undefined,
+      ["foo/1.0.0", "bar/2.0.0"],
+    );
+
+    expect(helper.minimalFiles.writeFile).toBeCalled();
+
+    expect(
+      helper.getFiles()[`${BASE_PATH}/Ontology.ts`],
+    ).toMatchInlineSnapshot(`
+        "import type { OntologyDefinition } from '@osdk/api';
+        import type { Ontology as ClientOntology } from '@osdk/legacy-client';
+        import type { Actions } from './ontology/actions/Actions';
+        import type { Objects } from './ontology/objects/Objects';
+        import type { Queries } from './ontology/queries/Queries';
+
+        export const Ontology: {
+          metadata: {
+            ontologyRid: 'rid';
+            ontologyApiName: 'apiName';
+            userAgent: 'foundry-typescript-osdk/0.0.1 foo/1.0.0 bar/2.0.0';
+          };
+          objects: {};
+          actions: {};
+          queries: {};
+        } = {
+          metadata: {
+            ontologyRid: 'rid' as const,
+            ontologyApiName: 'apiName' as const,
+            userAgent: 'foundry-typescript-osdk/0.0.1 foo/1.0.0 bar/2.0.0' as const,
+          },
+          objects: {},
+          actions: {},
+          queries: {},
+        } satisfies OntologyDefinition<never, never, never>;
+        
+        export interface Ontology extends ClientOntology<typeof Ontology> {
+          objects: Objects;
+          actions: Actions;
+          queries: Queries;
+        }
+        "
+      `);
+  });
 });

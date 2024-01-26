@@ -32,7 +32,7 @@ export function createClient<O extends OntologyDefinition<any>>(
     ontology,
     stack,
     tokenProvider,
-    "@osdk/client/0.0.0 ()",
+    "@osdk/client/0.0.0",
     fetchFn,
   );
 

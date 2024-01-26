@@ -37,6 +37,7 @@ export async function generateClientSdkVersionOneDotOne(
   fs: MinimalFs,
   outDir: string,
   packageType: "commonjs" | "module" = "commonjs",
+  additionalUserAgents: string[] = [],
 ) {
   const importExt = packageType === "module" ? ".js" : "";
   const objectsDir = path.join(outDir, "ontology", "objects");
@@ -47,7 +48,13 @@ export async function generateClientSdkVersionOneDotOne(
 
   const sanitizedOntology = sanitizeMetadata(ontology);
   await generateFoundryClientFile(fs, outDir, importExt);
-  await generateMetadataFile(sanitizedOntology, fs, outDir, importExt);
+  await generateMetadataFile(
+    sanitizedOntology,
+    fs,
+    outDir,
+    importExt,
+    additionalUserAgents,
+  );
   await generateOntologyIndexFile(
     fs,
     path.join(outDir, "ontology"),

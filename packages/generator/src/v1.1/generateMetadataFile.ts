@@ -26,6 +26,7 @@ export async function generateMetadataFile(
   fs: MinimalFs,
   outDir: string,
   importExt: string = "",
+  additionalUserAgents: string[] = [],
 ) {
   const objectNames = Object.keys(ontology.objectTypes);
   const actionNames = Object.keys(ontology.actionTypes);
@@ -60,6 +61,9 @@ export async function generateMetadataFile(
       return name;
     }
   };
+
+  const userAgent = ["foundry-typescript-osdk/0.0.1", ...additionalUserAgents]
+    .join(" ");
 
   await fs.writeFile(
     path.join(outDir, "Ontology.ts"),
@@ -97,7 +101,7 @@ export async function generateMetadataFile(
     metadata: {
       ontologyRid: "${ontology.ontology.rid}",
       ontologyApiName: "${ontology.ontology.apiName}",
-      userAgent: "foundry-typescript-osdk/0.0.1",
+      userAgent: "${userAgent}",
     },
     objects: {
       ${commaSeparatedTypeIdentifiers(objectNames)}
@@ -112,7 +116,7 @@ export async function generateMetadataFile(
     metadata: {
         ontologyRid: "${ontology.ontology.rid}" as const,
         ontologyApiName: "${ontology.ontology.apiName}" as const,
-        userAgent: "foundry-typescript-osdk/0.0.1" as const,
+        userAgent: "${userAgent}" as const,
     },
     objects: {
         ${commaSeparatedIdentifiers(objectNames)}

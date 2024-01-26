@@ -30,6 +30,7 @@ export async function generateClientSdkVersionTwoPointZero(
   fs: MinimalFs,
   outDir: string,
   packageType: "module" | "commonjs" = "commonjs",
+  additionalUserAgents: string[] = [],
 ) {
   await verifyOutdir(outDir, fs);
 
@@ -54,7 +55,12 @@ export async function generateClientSdkVersionTwoPointZero(
     ),
   );
 
-  await generateOntologyMetadataFile(sanitizedOntology, fs, outDir);
+  await generateOntologyMetadataFile(
+    sanitizedOntology,
+    fs,
+    outDir,
+    additionalUserAgents,
+  );
 
   await fs.writeFile(
     path.join(outDir, "Ontology.ts"),
